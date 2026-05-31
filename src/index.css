@@ -943,27 +943,6 @@ a {
   transform: translateZ(-90px) rotateX(74deg);
 }
 
-.booking-plate {
-  position: absolute;
-  inset: 1.1rem;
-  border: 1px solid rgba(255, 79, 175, 0.2);
-  border-radius: 1.8rem;
-  pointer-events: none;
-  transform-style: preserve-3d;
-}
-
-.plate-one {
-  background: linear-gradient(145deg, rgba(255, 79, 175, 0.22), rgba(255, 255, 255, 0.04));
-  box-shadow: 0 30px 90px rgba(255, 79, 175, 0.12);
-  animation: bookingPlateOne 6.5s ease-in-out infinite;
-}
-
-.plate-two {
-  inset: 2rem;
-  background: rgba(255, 79, 175, 0.08);
-  animation: bookingPlateTwo 8s ease-in-out infinite;
-}
-
 .booking-panel {
   position: relative;
   z-index: 3;
@@ -1171,16 +1150,6 @@ footer span {
 @keyframes bookingPanelFloat {
   0%, 100% { transform: translateZ(28px); }
   50% { transform: translateZ(38px) translateY(-4px); }
-}
-
-@keyframes bookingPlateOne {
-  0%, 100% { transform: translateZ(-46px) rotateX(6deg) rotateY(-8deg); }
-  50% { transform: translateZ(-62px) rotateX(-4deg) rotateY(8deg); }
-}
-
-@keyframes bookingPlateTwo {
-  0%, 100% { transform: translateZ(-86px) rotateX(-5deg) rotateY(9deg); }
-  50% { transform: translateZ(-72px) rotateX(7deg) rotateY(-7deg); }
 }
 
 @keyframes logoPulse {

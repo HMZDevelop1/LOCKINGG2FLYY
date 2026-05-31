@@ -6,7 +6,7 @@ const BRAND = "Looking2FlyyByMKash";
 const LOGO = "/images/logo.png";
 const INSTAGRAM = "https://www.instagram.com/looking2flyy._.bymkash/";
 const TIKTOK = "https://www.tiktok.com/@looking2flyybymkash";
-const MAPS = "https://www.google.com/maps/dir/?api=1&destination=49%20Rue%20Lemieux%20%231%2C%20Gatineau%2C%20QC%20J8Z%201G7";
+const MAPS = "https://maps.app.goo.gl/HkJgV5TAzphz6q1U8";
 const PHONE = "873-660-0144";
 const PHONE_LINK = "tel:+18736600144";
 const EMAIL = "Meaneatanganaowona@gmail.com";
@@ -17,16 +17,45 @@ const sections = [
   ["services", "Services"],
   ["prices", "Prix"],
   ["about", "Studio"],
-  ["policies", "Regles"],
+  ["policies", "Règles"],
   ["gallery", "Galerie"],
   ["book", "Book"],
   ["contact", "Contact"],
 ];
 
 const prices = [
-  ["Locs / Dreads", [["Simple retwist", "$55"], ["Interlock retwist", "$65"], ["Micro locs retwist", "$70"], ["Crochet retwist", "$180"], ["Half barrels", "$65"], ["Barrels", "$70"], ["Half barrels + 2 strand", "$75"], ["Cornrows", "$75"], ["2 Strand", "$75"], ["Braids", "$75"]]],
-  ["Natural Hair", [["Half head cornrows", "$35"], ["Basic cornrows 4 or less", "$50"], ["Cornrows 6+", "$60"], ["Cornrows with design", "$60-$80"], ["Basic twist", "$60"], ["2 strand twist", "$70"], ["Braids", "$80"], ["Barrels", "$70"], ["Half barrels + half twist", "$75-$80"], ["Starter locs comb", "$120"], ["Starter locs crochet", "$200-$300"]]],
-  ["Extensions", [["Knotless braids med/large", "$90-$120"], ["Boho knotless braids", "$120"], ["Twist", "$90"], ["Locs extension", "$300-$500"], ["Cornrows", "$85"]]],
+  ["Locs / Dreads", [
+    ["Simple retwist", "$55"],
+    ["Interlock retwist", "$65"],
+    ["Micro locs retwist", "$70"],
+    ["Crochet retwist", "$180"],
+    ["Half barrels", "$65"],
+    ["Barrels", "$70"],
+    ["Half barrels + 2 strand", "$75"],
+    ["Cornrows", "$75"],
+    ["2 Strand", "$75"],
+    ["Braids", "$75"],
+  ]],
+  ["Natural Hair", [
+    ["Half head cornrows", "$35"],
+    ["Basic cornrows 4 or less", "$50"],
+    ["Cornrows 6+", "$60"],
+    ["Cornrows with design", "$60-$80"],
+    ["Basic twist", "$60"],
+    ["2 strand twist", "$70"],
+    ["Braids", "$80"],
+    ["Barrels", "$70"],
+    ["Half barrels + half twist", "$75-$80"],
+    ["Starter locs comb", "$120"],
+    ["Starter locs crochet", "$200-$300"],
+  ]],
+  ["Extensions", [
+    ["Knotless braids med/large", "$90-$120"],
+    ["Boho knotless braids", "$120"],
+    ["Twist", "$90"],
+    ["Locs extension", "$300-$500"],
+    ["Cornrows", "$85"],
+  ]],
 ];
 
 const services = [
@@ -304,7 +333,7 @@ function About() {
 
 function Policies() {
   return (
-    <Section id="policies" title="Policies" kicker="A lire avant de reserver.">
+    <Section id="policies" title="Policies" kicker="À lire avant de réserver.">
       <motion.div className="policy-grid" variants={stagger}>
         {policies.map(([title, text], index) => (
           <motion.article
