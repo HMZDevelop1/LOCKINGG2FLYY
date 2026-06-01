@@ -107,6 +107,14 @@ const en = {
   bookNote: "You will be redirected to Google Calendar to complete your booking.",
   contactTitle: "Contact",
   contactKicker: "Booking and information.",
+  contactFormTitle: "Send a message",
+  contactFormName: "Your Name",
+  contactFormEmail: "Your Email",
+  contactFormPhone: "Your Phone",
+  contactFormMessage: "Your Message",
+  contactFormSubmit: "Send Message",
+  contactFormSuccess: "Message sent! I'll get back to you soon.",
+  contactFormError: "Please fill in all required fields.",
   scheduleBtn: "Schedule Appointment",
   footerText: "Designed by",
 };
@@ -204,6 +212,14 @@ const fr = {
   bookNote: "Vous serez redirige vers Google Calendar pour completer votre reservation.",
   contactTitle: "Contact",
   contactKicker: "Reservation et informations.",
+  contactFormTitle: "Envoyer un message",
+  contactFormName: "Votre Nom",
+  contactFormEmail: "Votre Email",
+  contactFormPhone: "Votre Telephone",
+  contactFormMessage: "Votre Message",
+  contactFormSubmit: "Envoyer",
+  contactFormSuccess: "Message envoye ! Je vous repondrai bientot.",
+  contactFormError: "Veuillez remplir tous les champs requis.",
   scheduleBtn: "Prendre rendez-vous",
   footerText: "Concu par",
 };
@@ -704,39 +720,32 @@ function Booking() {
         variants={formReveal}
         transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="booking-layout">
-          <motion.div
-            className="booking-logo-wrap booking-logo-premium"
-            animate={{ y: [0, -10, 0], rotateY: [-12, 12, -12], rotateX: [5, -4, 5] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            whileHover={{ scale: 1.05, rotateY: -20, rotateX: 6, transition: { duration: 0.4 } }}
-          >
-            <div className="booking-logo-halo" />
-            <motion.div className="booking-logo-orbit orbit-one" animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
-            <motion.div className="booking-logo-orbit orbit-two" animate={{ rotate: -360 }} transition={{ duration: 26, repeat: Infinity, ease: "linear" }} />
-            <div className="booking-logo-shadow" />
-            <Logo animated />
-          </motion.div>
-
-          <div className="booking-panel booking-panel-3d booking-panel-google">
-            <div className="google-book-hero">
-              <div className="google-book-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M16 2v4M8 2v4M3 10h18" />
-                </svg>
-              </div>
-              <h3>{t.bookHeading}</h3>
-              <p>{t.bookText}</p>
-            </div>
-            <a className="gcal-book-btn" href={GCAL} target="_blank" rel="noreferrer">
+        <div className="booking-hero-card">
+          <div className="booking-hero-bg" />
+          <div className="booking-hero-content">
+            <motion.div
+              className="booking-hero-icon"
+              animate={{ y: [0, -6, 0], scale: [1, 1.04, 1] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+                <circle cx="12" cy="16" r="1.5" />
+                <circle cx="17" cy="16" r="1.5" />
+                <circle cx="7" cy="16" r="1.5" />
+              </svg>
+            </motion.div>
+            <h3 className="booking-hero-heading">{t.bookHeading}</h3>
+            <p className="booking-hero-text">{t.bookText}</p>
+            <a className="gcal-book-btn" href={GCAL} target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <path d="M16 2v4M8 2v4M3 10h18" />
               </svg>
               {t.bookBtn}
             </a>
-            <p className="google-book-note">{t.bookNote}</p>
+            <p className="booking-hero-note">{t.bookNote}</p>
           </div>
         </div>
       </motion.div>
@@ -755,6 +764,10 @@ function Contact() {
     visible: { opacity: 1, y: 0, rotateX: 0, rotateY: 0, scale: 1 },
   }), []);
 
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [formStatus, setFormStatus] = useState("");
+  const [formError, setFormError] = useState(false);
+
   const copyPhone = async () => {
     try { await navigator.clipboard.writeText(PHONE); }
     catch { window.location.href = PHONE_LINK; }
@@ -764,44 +777,101 @@ function Contact() {
     catch { window.location.href = EMAIL_LINK; }
   };
 
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (formError) setFormError(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { name, email, message } = form;
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setFormError(true);
+      setFormStatus(t.contactFormError);
+      return;
+    }
+    const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(`Looking2Flyy - ${name}`)}&body=${encodeURIComponent(`${message}\n\n---\n${name}\n${email}\n${form.phone || "No phone"}`)}`;
+    window.location.href = mailto;
+    setForm({ name: "", email: "", phone: "", message: "" });
+    setFormStatus(t.contactFormSuccess);
+    setTimeout(() => setFormStatus(""), 4000);
+  };
+
   return (
     <Section id="contact" title={t.contactTitle} kicker={t.contactKicker}>
-      <div className="contact-actions">
-        <a className="gcal-contact-btn" href={GCAL} target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <path d="M16 2v4M8 2v4M3 10h18" />
-          </svg>
-          {t.scheduleBtn}
-        </a>
-      </div>
-      <div className="contact-socials">
-        <button type="button" onClick={() => {
-          const w = window.open(INSTAGRAM, "_blank", "noopener,noreferrer");
-          if (!w) window.location.href = INSTAGRAM;
-        }}>
-          <InstagramIcon /> Instagram
-        </button>
-        <button type="button" onClick={() => {
-          const w = window.open(TIKTOK, "_blank", "noopener,noreferrer");
-          if (!w) window.location.href = TIKTOK;
-        }}>
-          <TikTokIcon /> TikTok
-        </button>
-      </div>
-      <motion.div className="contact-grid" variants={stagger}>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyPhone}>
-          <Phone size={20} /> {PHONE}
-        </motion.button>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyEmail}>
-          <Mail size={20} /> {EMAIL}
-        </motion.button>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={() => {
-          const w = window.open(MAPS, "_blank", "noopener,noreferrer");
-          if (!w) window.location.href = MAPS;
-        }}>
-          <MapPin size={20} /> 49 Rue Lemieux #1, Gatineau, QC J8Z 1G7
-        </motion.button>
+      <motion.div className="contact-layout" variants={stagger}>
+        {/* Left — Info */}
+        <motion.div className="contact-info-col" variants={card3d}>
+          <div className="contact-info-cards">
+            <motion.button type="button" className="lift-card contact-button" whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyPhone}>
+              <div className="contact-icon-box"><Phone size={18} /></div>
+              <div className="contact-btn-text"><strong>{PHONE}</strong><small>Call or text</small></div>
+            </motion.button>
+            <motion.button type="button" className="lift-card contact-button" whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyEmail}>
+              <div className="contact-icon-box"><Mail size={18} /></div>
+              <div className="contact-btn-text"><strong>{EMAIL}</strong><small>Click to copy</small></div>
+            </motion.button>
+            <motion.button type="button" className="lift-card contact-button" whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={() => {
+              const w = window.open(MAPS, "_blank", "noopener,noreferrer");
+              if (!w) window.location.href = MAPS;
+            }}>
+              <div className="contact-icon-box"><MapPin size={18} /></div>
+              <div className="contact-btn-text"><strong>49 Rue Lemieux #1</strong><small>Gatineau, QC J8Z 1G7</small></div>
+            </motion.button>
+          </div>
+          <div className="contact-social-row">
+            <button className="contact-social-btn" type="button" onClick={() => {
+              const w = window.open(INSTAGRAM, "_blank", "noopener,noreferrer");
+              if (!w) window.location.href = INSTAGRAM;
+            }}>
+              <InstagramIcon />
+              <span>Instagram</span>
+            </button>
+            <button className="contact-social-btn" type="button" onClick={() => {
+              const w = window.open(TIKTOK, "_blank", "noopener,noreferrer");
+              if (!w) window.location.href = TIKTOK;
+            }}>
+              <TikTokIcon />
+              <span>TikTok</span>
+            </button>
+          </div>
+          <a className="gcal-contact-btn" href={GCAL} target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            {t.scheduleBtn}
+          </a>
+        </motion.div>
+
+        {/* Right — Form */}
+        <motion.div className="contact-form-col" variants={card3d}>
+          <div className="contact-form-card">
+            <h4 className="contact-form-title">{t.contactFormTitle}</h4>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="contact-form-field">
+                <label htmlFor="cf-name">{t.contactFormName} <span className="required">*</span></label>
+                <input id="cf-name" name="name" type="text" value={form.name} onChange={handleChange} placeholder={t.contactFormName} required />
+              </div>
+              <div className="contact-form-field">
+                <label htmlFor="cf-email">{t.contactFormEmail} <span className="required">*</span></label>
+                <input id="cf-email" name="email" type="email" value={form.email} onChange={handleChange} placeholder={t.contactFormEmail} required />
+              </div>
+              <div className="contact-form-field">
+                <label htmlFor="cf-phone">{t.contactFormPhone}</label>
+                <input id="cf-phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder={t.contactFormPhone} />
+              </div>
+              <div className="contact-form-field">
+                <label htmlFor="cf-message">{t.contactFormMessage} <span className="required">*</span></label>
+                <textarea id="cf-message" name="message" value={form.message} onChange={handleChange} placeholder={t.contactFormMessage} rows={4} required />
+              </div>
+              <button className="contact-form-submit" type="submit">{t.contactFormSubmit}</button>
+              {formStatus && (
+                <p className={`contact-form-status ${formError ? "status-error" : "status-ok"}`}>{formStatus}</p>
+              )}
+            </form>
+          </div>
+        </motion.div>
       </motion.div>
     </Section>
   );
