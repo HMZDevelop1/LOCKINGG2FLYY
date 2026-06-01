@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Globe, Mail, MapPin, Menu, Phone, Scissors, Sparkles, X } from "lucide-react";
 import Lenis from "lenis";
 
@@ -477,45 +477,28 @@ const floatingIconVariant = (index) => ({
 
 function Hero() {
   const { t } = useLang();
-  const { scrollY } = useScroll();
-  const heroParallax = useTransform(scrollY, [0, 600], [0, 160]);
-  const heroFade = useTransform(scrollY, [0, 450], [1, 0.3]);
-  const artParallax = useTransform(scrollY, [0, 600], [0, -50]);
 
   return (
     <section id="home" className="hero">
-      <div className="hero-parallax-bg" />
-      <motion.div className="hero-grid" style={{ y: heroParallax }}>
+      <div className="hero-grid">
         <motion.div
           className="hero-copy"
-          style={{ opacity: heroFade }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="eyebrow"><span className="eyebrow-divider" /> {t.heroEyebrow}</p>
           <h1>{t.heroTitle1}<br /><span>{t.heroTitle2}</span></h1>
           <p className="hero-text">{t.heroText}</p>
           <div className="hero-buttons">
-            <div className="hero-cta-wrap">
-              <motion.div
-                className="hero-cta-icon"
-                animate={{ y: [0, -5, 0], scale: [1, 1.04, 1] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M16 2v4M8 2v4M3 10h18" />
-                  <circle cx="12" cy="16" r="1.8" />
-                  <circle cx="17" cy="16" r="1.8" />
-                  <circle cx="7" cy="16" r="1.8" />
-                </svg>
-              </motion.div>
-              <a className="gcal-button" href={GCAL} target="_blank" rel="noreferrer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M16 2v4M8 2v4M3 10h18" />
-                </svg>
-                {t.bookCall}
-              </a>
-            </div>
+            <a className="gcal-button" href={GCAL} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18">
+                <path d="M6 4v3M18 4v3M4 10h16M8 14l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M2 9h20" strokeWidth="1.4" />
+              </svg>
+              {t.bookCall}
+            </a>
             <button className="secondary-button" onClick={() => {
               const el = document.getElementById("prices");
               if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -537,7 +520,9 @@ function Hero() {
 
         <motion.div
           className="hero-art"
-          style={{ y: artParallax }}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
             className="logo-orbit"
@@ -565,27 +550,24 @@ function Hero() {
             <AwardIcon />
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
 
 function Section({ id, title, kicker, children }) {
-  const { scrollYProgress } = useScroll();
-  const sectionReveal = useTransform(scrollYProgress, [0, 1], [0, 0]);
-
   return (
     <motion.section
       id={id}
       className="section section-3d"
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.12, margin: "-40px 0px" }}
+      viewport={{ once: true, amount: 0.15 }}
       variants={{
-        hidden: { opacity: 0, y: 50, rotateX: -8, scale: 0.97 },
-        visible: { opacity: 1, y: 0, rotateX: 0, scale: 1 },
+        hidden: { opacity: 0, y: 40, rotateX: -6 },
+        visible: { opacity: 1, y: 0, rotateX: 0 },
       }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="section-inner section-stage">
         {kicker && <p className="section-kicker">{kicker}</p>}
