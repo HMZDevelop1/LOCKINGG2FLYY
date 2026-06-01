@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Mail, MapPin, Menu, Phone, Scissors, Sparkles, X } from "lucide-react";
+import Lenis from "lenis";
 
 const BRAND = "Looking2FlyyByMKash";
 const LOGO = "/images/logo.png";
@@ -83,36 +84,28 @@ const galleryItems = [
   ["Starter Locs", "Fresh foundation work", "/images/work/starter-locs.jpg"],
 ];
 
-const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-
 const openExternal = (url) => {
   const opened = window.open(url, "_blank", "noopener,noreferrer");
-  if (!opened) {
-    window.location.href = url;
-  }
+  if (!opened) window.location.href = url;
 };
 
 const reveal = {
-  hidden: { opacity: 0, y: 34, rotateX: -8 },
+  hidden: { opacity: 0, y: 40, rotateX: -6 },
   visible: { opacity: 1, y: 0, rotateX: 0 },
 };
 
 const stagger = {
   hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.09,
-    },
-  },
+  visible: { transition: { staggerChildren: 0.09 } },
 };
 
 const card3d = {
-  hidden: { opacity: 0, y: 28, rotateX: -12, rotateY: 4, scale: 0.96 },
+  hidden: { opacity: 0, y: 32, rotateX: -10, rotateY: 3, scale: 0.95 },
   visible: { opacity: 1, y: 0, rotateX: 0, rotateY: 0, scale: 1 },
 };
 
 const formReveal = {
-  hidden: { opacity: 0, y: 26, scale: 0.98 },
+  hidden: { opacity: 0, y: 30, scale: 0.97 },
   visible: { opacity: 1, y: 0, scale: 1 },
 };
 
@@ -179,27 +172,23 @@ function Header() {
   const indicatorRef = useRef(null);
 
   const go = useCallback((id) => {
-    scrollTo(id);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
     setOpen(false);
   }, []);
 
   useEffect(() => {
     const ids = sections.map(([id]) => id);
-    const observers = [];
-
-    ids.forEach((id) => {
+    const observers = ids.map((id) => {
       const el = document.getElementById(id);
-      if (!el) return;
+      if (!el) return null;
       const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActive(id);
-        },
+        ([entry]) => { if (entry.isIntersecting) setActive(id); },
         { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
       );
       observer.observe(el);
-      observers.push(observer);
-    });
-
+      return observer;
+    }).filter(Boolean);
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
@@ -242,7 +231,7 @@ function Header() {
           <SocialLink href={INSTAGRAM} label="Instagram"><InstagramIcon /></SocialLink>
           <SocialLink href={TIKTOK} label="TikTok"><TikTokIcon /></SocialLink>
           <a className="book-pill" href={GCAL} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <rect x="3" y="4" width="18" height="18" rx="2" />
               <path d="M16 2v4M8 2v4M3 10h18" />
             </svg>
@@ -281,28 +270,50 @@ function Header() {
 function Hero() {
   return (
     <section id="home" className="hero">
-      <div className="texture" />
       <div className="hero-grid">
-        <motion.div className="hero-copy" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }}>
-          <p className="eyebrow"><Sparkles size={16} /> Premium Hair Studio - Gatineau</p>
+        <motion.div
+          className="hero-copy"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="eyebrow"><Sparkles size={15} /> Premium Hair Studio - Gatineau</p>
           <h1>Clean Locs, Braids<br /><span>Made To Last</span></h1>
           <p className="hero-text">Private appointments in Gatineau for locs, natural hair and extension styles with a polished finish.</p>
           <div className="hero-buttons">
-            <a className="primary-button gcal-button" href={GCAL} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
+            <a className="gcal-button" href={GCAL} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <path d="M16 2v4M8 2v4M3 10h18" />
-                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
               </svg>
               Book a Call
             </a>
-            <button className="secondary-button" onClick={() => scrollTo("prices")}><Scissors size={19} /> Voir les prix</button>
+            <button className="secondary-button" onClick={() => {
+              const el = document.getElementById("prices");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}>
+              <Scissors size={18} /> Voir les prix
+            </button>
           </div>
         </motion.div>
 
-        <motion.div className="hero-art" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }}>
-          <motion.div className="logo-orbit" animate={{ rotate: 360 }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }} />
-          <motion.div className="hero-logo-card" animate={{ y: [0, -14, 0], rotateY: [-10, 12, -10], rotateX: [5, -4, 5] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} whileHover={{ scale: 1.04, rotateY: -18 }}>
+        <motion.div
+          className="hero-art"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            className="logo-orbit"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="hero-logo-card"
+            animate={{ y: [0, -12, 0], rotateY: [-8, 10, -8], rotateX: [4, -3, 4] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.05, rotateY: -16, transition: { duration: 0.4 } }}
+          >
             <Logo animated />
           </motion.div>
         </motion.div>
@@ -318,9 +329,9 @@ function Section({ id, title, kicker, children, pink = false }) {
       className={`section ${pink ? "section-pink" : ""}`}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: true, amount: 0.15 }}
       variants={reveal}
-      transition={{ duration: 0.7, ease: "easeOut" }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="section-inner section-stage">
         {kicker && <p className="section-kicker">{kicker}</p>}
@@ -340,12 +351,20 @@ function Services() {
             key={title}
             className="service-card lift-card"
             variants={card3d}
-            transition={{ duration: 0.62, ease: "easeOut" }}
-            whileHover={{ y: -12, rotateX: 7, rotateY: index % 2 ? 7 : -7, scale: 1.02 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{
+              y: -10,
+              rotateX: 5,
+              rotateY: index % 2 ? 5 : -5,
+              scale: 1.015,
+              transition: { duration: 0.35 },
+            }}
           >
             <WorkImage src={image} title={title} className="service-work-image" />
-            <h3>{title}</h3>
-            <p>{text}</p>
+            <div className="service-card-content">
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </div>
           </motion.article>
         ))}
       </motion.div>
@@ -362,8 +381,14 @@ function Prices() {
             className="price-card lift-card"
             key={title}
             variants={card3d}
-            transition={{ duration: 0.62, ease: "easeOut" }}
-            whileHover={{ y: -10, rotateX: 6, rotateY: -4, scale: 1.015 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{
+              y: -8,
+              rotateX: 4,
+              rotateY: -3,
+              scale: 1.012,
+              transition: { duration: 0.35 },
+            }}
           >
             <h3>{title}</h3>
             {items.map(([name, price]) => (
@@ -375,7 +400,9 @@ function Prices() {
           </motion.article>
         ))}
       </motion.div>
-      <motion.div className="note-card lift-card" variants={card3d} whileHover={{ rotateX: 5, y: -6 }}>+$15 design - +$10 blow dry</motion.div>
+      <motion.div className="note-card lift-card" variants={card3d} whileHover={{ rotateX: 4, y: -4, transition: { duration: 0.3 } }}>
+        +$15 design - +$10 blow dry
+      </motion.div>
     </Section>
   );
 }
@@ -383,16 +410,20 @@ function Prices() {
 function About() {
   return (
     <Section id="about" title="Studio" kicker="Professional, private, polished.">
-      <motion.div className="studio-scene" variants={card3d} transition={{ duration: 0.72, ease: "easeOut" }} whileHover="hover">
-        <motion.div className="studio-art" animate={{ y: [0, -12, 0], rotateY: [-12, 13, -12], rotateX: [5, -4, 5] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
-          <motion.div className="studio-orbit" animate={{ rotate: 360 }} transition={{ duration: 22, repeat: Infinity, ease: "linear" }} />
+      <motion.div className="studio-scene" variants={card3d} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover="hover">
+        <motion.div
+          className="studio-art"
+          animate={{ y: [0, -10, 0], rotateY: [-10, 11, -10], rotateX: [4, -3, 4] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <motion.div className="studio-orbit" animate={{ rotate: 360 }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} />
           <div className="studio-glow" />
           <Logo animated />
         </motion.div>
-        <motion.div className="about-panel studio-panel lift-card" variants={{ hover: { rotateY: -5, rotateX: 4, y: -8 } }} transition={{ duration: 0.45, ease: "easeOut" }}>
+        <motion.div className="about-panel studio-panel lift-card" variants={{ hover: { rotateY: -4, rotateX: 3, y: -6 } }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
           <p>Looking2FlyyByMKash est un service hair premium a Gatineau, pense pour des resultats propres, styles et une experience de rendez-vous confortable.</p>
-          <motion.a className="map-button studio-map-card" href={MAPS} target="_blank" rel="noreferrer" whileHover={{ y: -4, rotateX: 5, scale: 1.015 }} whileTap={{ scale: 0.98 }}>
-            <span className="map-pin-scene"><MapPin size={22} /><i /></span>
+          <motion.a className="map-button studio-map-card" href={MAPS} target="_blank" rel="noreferrer" whileHover={{ y: -3, rotateX: 4, scale: 1.012 }} whileTap={{ scale: 0.98 }}>
+            <span className="map-pin-scene"><MapPin size={20} /><i /></span>
             <span>
               <strong>49 Rue Lemieux #1, Gatineau</strong>
             </span>
@@ -405,15 +436,21 @@ function About() {
 
 function Policies() {
   return (
-    <Section id="policies" title="Policies" kicker="À lire avant de réserver.">
+    <Section id="policies" title="Policies" kicker="A lire avant de reserver.">
       <motion.div className="policy-grid" variants={stagger}>
         {policies.map(([title, text], index) => (
           <motion.article
             key={title}
             className="policy-card lift-card"
             variants={card3d}
-            transition={{ duration: 0.58, ease: "easeOut" }}
-            whileHover={{ y: -9, rotateX: 7, rotateY: index % 2 ? -5 : 5, scale: 1.018 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{
+              y: -7,
+              rotateX: 5,
+              rotateY: index % 2 ? -4 : 4,
+              scale: 1.015,
+              transition: { duration: 0.3 },
+            }}
           >
             <h3>{title}</h3>
             <p>{text}</p>
@@ -437,8 +474,14 @@ function Gallery() {
             rel="noreferrer"
             className="gallery-tile lift-card"
             variants={card3d}
-            transition={{ duration: 0.58, ease: "easeOut" }}
-            whileHover={{ y: -12, rotateX: 8, rotateY: index % 2 ? 6 : -6, scale: 1.025 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{
+              y: -10,
+              rotateX: 6,
+              rotateY: index % 2 ? 5 : -5,
+              scale: 1.02,
+              transition: { duration: 0.3 },
+            }}
           >
             <WorkImage src={image} title={title} text={text} />
           </motion.a>
@@ -454,19 +497,18 @@ function Booking() {
       <motion.div
         className="booking-scene"
         variants={formReveal}
-        transition={{ duration: 0.65, ease: "easeOut" }}
-        whileHover="hover"
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="booking-layout">
           <motion.div
             className="booking-logo-wrap booking-logo-premium"
-            animate={{ y: [0, -12, 0], rotateY: [-14, 14, -14], rotateX: [6, -5, 6] }}
-            transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
-            whileHover={{ scale: 1.055, rotateY: -24, rotateX: 8 }}
+            animate={{ y: [0, -10, 0], rotateY: [-12, 12, -12], rotateX: [5, -4, 5] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.05, rotateY: -20, rotateX: 6, transition: { duration: 0.4 } }}
           >
             <div className="booking-logo-halo" />
-            <motion.div className="booking-logo-orbit orbit-one" animate={{ rotate: 360 }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }} />
-            <motion.div className="booking-logo-orbit orbit-two" animate={{ rotate: -360 }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} />
+            <motion.div className="booking-logo-orbit orbit-one" animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
+            <motion.div className="booking-logo-orbit orbit-two" animate={{ rotate: -360 }} transition={{ duration: 26, repeat: Infinity, ease: "linear" }} />
             <div className="booking-logo-shadow" />
             <Logo animated />
           </motion.div>
@@ -477,17 +519,15 @@ function Booking() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
                   <path d="M16 2v4M8 2v4M3 10h18" />
-                  <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
                 </svg>
               </div>
               <h3>Reservez votre rendez-vous</h3>
               <p>Choisissez le creneau qui vous arrange via Google Calendar. Simple, rapide et securise.</p>
             </div>
             <a className="gcal-book-btn" href={GCAL} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <path d="M16 2v4M8 2v4M3 10h18" />
-                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
               </svg>
               Schedule Appointment
             </a>
@@ -501,28 +541,21 @@ function Booking() {
 
 function Contact() {
   const copyContactPhone = async () => {
-    try {
-      await navigator.clipboard.writeText(PHONE);
-    } catch {
-      window.location.href = PHONE_LINK;
-    }
+    try { await navigator.clipboard.writeText(PHONE); }
+    catch { window.location.href = PHONE_LINK; }
   };
   const copyContactEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-    } catch {
-      window.location.href = EMAIL_LINK;
-    }
+    try { await navigator.clipboard.writeText(EMAIL); }
+    catch { window.location.href = EMAIL_LINK; }
   };
 
   return (
     <Section id="contact" title="Contact" kicker="Reservation et informations.">
       <div className="contact-actions">
         <a className="gcal-contact-btn" href={GCAL} target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
             <rect x="3" y="4" width="18" height="18" rx="2" />
             <path d="M16 2v4M8 2v4M3 10h18" />
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
           </svg>
           Schedule Appointment
         </a>
@@ -532,15 +565,35 @@ function Contact() {
         <button type="button" onClick={() => openExternal(TIKTOK)}><TikTokIcon /> TikTok</button>
       </div>
       <motion.div className="contact-grid" variants={stagger}>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -8, rotateX: 6 }} onClick={copyContactPhone}><Phone size={21} /> {PHONE}</motion.button>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -8, rotateX: 6 }} onClick={copyContactEmail}><Mail size={21} /> {EMAIL}</motion.button>
-        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -8, rotateX: 6 }} onClick={() => openExternal(MAPS)}><MapPin size={21} /> 49 Rue Lemieux #1, Gatineau, QC J8Z 1G7</motion.button>
+        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyContactPhone}>
+          <Phone size={20} /> {PHONE}
+        </motion.button>
+        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={copyContactEmail}>
+          <Mail size={20} /> {EMAIL}
+        </motion.button>
+        <motion.button type="button" className="lift-card contact-button" variants={card3d} whileHover={{ y: -6, rotateX: 4, transition: { duration: 0.3 } }} onClick={() => openExternal(MAPS)}>
+          <MapPin size={20} /> 49 Rue Lemieux #1, Gatineau, QC J8Z 1G7
+        </motion.button>
       </motion.div>
     </Section>
   );
 }
 
 export default function App() {
+  const lenisRef = useRef(null);
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+    lenisRef.current = lenis;
+    const raf = (time) => { lenis.raf(time); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+    return () => lenis.destroy();
+  }, []);
+
   return (
     <main>
       <Header />
