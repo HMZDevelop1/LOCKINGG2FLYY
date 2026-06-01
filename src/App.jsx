@@ -19,7 +19,7 @@ const sections = [
   ["about", "Studio"],
   ["policies", "Règles"],
   ["gallery", "Galerie"],
-  ["book", "Book"],
+  ["book", "Google Book"],
   ["contact", "Contact"],
 ];
 
@@ -195,7 +195,7 @@ function Header() {
         <div className="header-actions">
           <SocialLink href={INSTAGRAM} label="Instagram"><InstagramIcon /></SocialLink>
           <SocialLink href={TIKTOK} label="TikTok"><TikTokIcon /></SocialLink>
-          <button className="book-pill" onClick={() => go("book")}>Book</button>
+          <button className="book-pill" onClick={() => go("book")}>Google Book</button>
           <button className="menu-button" onClick={() => setOpen((value) => !value)} aria-label="Menu">
             {open ? <X size={21} /> : <Menu size={21} />}
           </button>
@@ -223,7 +223,7 @@ function Hero() {
           <h1>Clean Locs, Braids<br /><span>Made To Last</span></h1>
           <p className="hero-text">Private appointments in Gatineau for locs, natural hair and extension styles with a polished finish.</p>
           <div className="hero-buttons">
-            <button className="primary-button" onClick={() => scrollTo("book")}><CalendarDays size={19} /> Book Now</button>
+            <button className="primary-button" onClick={() => scrollTo("book")}><CalendarDays size={19} /> Google Book</button>
             <button className="secondary-button" onClick={() => scrollTo("prices")}><Scissors size={19} /> Voir les prix</button>
           </div>
         </motion.div>
@@ -397,7 +397,7 @@ function Booking() {
   };
 
   return (
-    <Section id="book" title="Book Now" kicker="Prepare ton message de reservation.">
+    <Section id="book" title="Google Book" kicker="Reserve via Google.">
       <motion.div
         className="booking-scene"
         variants={formReveal}
