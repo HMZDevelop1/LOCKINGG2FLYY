@@ -492,10 +492,9 @@ function Hero() {
           <p className="hero-text">{t.heroText}</p>
           <div className="hero-buttons">
             <a className="gcal-button" href={GCAL} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18">
-                <path d="M6 4v3M18 4v3M4 10h16M8 14l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <path d="M2 9h20" strokeWidth="1.4" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" className="btn-icon">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {t.bookCall}
             </a>
@@ -503,10 +502,9 @@ function Hero() {
               const el = document.getElementById("prices");
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18">
-                <path d="M6 4v3M18 4v3M4 10h16M8 14l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <path d="M2 9h20" strokeWidth="1.4" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" className="btn-icon">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {t.seePrices}
             </button>
