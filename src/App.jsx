@@ -503,7 +503,12 @@ function Hero() {
               const el = document.getElementById("prices");
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
-              <Scissors size={18} /> {t.seePrices}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18">
+                <path d="M6 4v3M18 4v3M4 10h16M8 14l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M2 9h20" strokeWidth="1.4" />
+              </svg>
+              {t.seePrices}
             </button>
           </div>
           <motion.div
