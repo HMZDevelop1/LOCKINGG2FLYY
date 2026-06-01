@@ -111,8 +111,10 @@ const en = {
   contactFormName: "Your Name",
   contactFormEmail: "Your Email",
   contactFormPhone: "Your Phone",
+  contactFormSubject: "Subject",
   contactFormMessage: "Your Message",
   contactFormSubmit: "Send Message",
+  contactFormSending: "Sending…",
   contactFormSuccess: "Message sent! I'll get back to you soon.",
   contactFormError: "Please fill in all required fields.",
   scheduleBtn: "Schedule Appointment",
@@ -216,8 +218,10 @@ const fr = {
   contactFormName: "Votre Nom",
   contactFormEmail: "Votre Email",
   contactFormPhone: "Votre Telephone",
+  contactFormSubject: "Sujet",
   contactFormMessage: "Votre Message",
   contactFormSubmit: "Envoyer",
+  contactFormSending: "Envoi en cours…",
   contactFormSuccess: "Message envoye ! Je vous repondrai bientot.",
   contactFormError: "Veuillez remplir tous les champs requis.",
   scheduleBtn: "Prendre rendez-vous",
@@ -764,9 +768,10 @@ function Contact() {
     visible: { opacity: 1, y: 0, rotateX: 0, rotateY: 0, scale: 1 },
   }), []);
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [formStatus, setFormStatus] = useState("");
   const [formError, setFormError] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const copyPhone = async () => {
     try { await navigator.clipboard.writeText(PHONE); }
@@ -782,19 +787,59 @@ function Contact() {
     if (formError) setFormError(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { name, email, message } = form;
-    if (!name.trim() || !email.trim() || !message.trim()) {
+  const validate = () => {
+    const { name, email, subject, message } = form;
+    if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
       setFormError(true);
       setFormStatus(t.contactFormError);
-      return;
+      return false;
     }
-    const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(`Looking2Flyy - ${name}`)}&body=${encodeURIComponent(`${message}\n\n---\n${name}\n${email}\n${form.phone || "No phone"}`)}`;
-    window.location.href = mailto;
-    setForm({ name: "", email: "", phone: "", message: "" });
-    setFormStatus(t.contactFormSuccess);
-    setTimeout(() => setFormStatus(""), 4000);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setFormError(true);
+      setFormStatus("Invalid email address.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormStatus("");
+    if (!validate()) return;
+    setSending(true);
+
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          subject: form.subject.trim(),
+          message: form.message.trim(),
+          _honeypot: "",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setFormError(true);
+        setFormStatus(data.error || "Failed to send. Please try again.");
+        return;
+      }
+
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+      setFormError(false);
+      setFormStatus(t.contactFormSuccess);
+      setTimeout(() => setFormStatus(""), 5000);
+    } catch {
+      setFormError(true);
+      setFormStatus("Network error. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -851,21 +896,38 @@ function Contact() {
             <form onSubmit={handleSubmit} noValidate>
               <div className="contact-form-field">
                 <label htmlFor="cf-name">{t.contactFormName} <span className="required">*</span></label>
-                <input id="cf-name" name="name" type="text" value={form.name} onChange={handleChange} placeholder={t.contactFormName} required />
+                <input id="cf-name" name="name" type="text" value={form.name} onChange={handleChange} placeholder={t.contactFormName} />
               </div>
               <div className="contact-form-field">
                 <label htmlFor="cf-email">{t.contactFormEmail} <span className="required">*</span></label>
-                <input id="cf-email" name="email" type="email" value={form.email} onChange={handleChange} placeholder={t.contactFormEmail} required />
+                <input id="cf-email" name="email" type="email" value={form.email} onChange={handleChange} placeholder={t.contactFormEmail} />
               </div>
               <div className="contact-form-field">
                 <label htmlFor="cf-phone">{t.contactFormPhone}</label>
                 <input id="cf-phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder={t.contactFormPhone} />
               </div>
               <div className="contact-form-field">
-                <label htmlFor="cf-message">{t.contactFormMessage} <span className="required">*</span></label>
-                <textarea id="cf-message" name="message" value={form.message} onChange={handleChange} placeholder={t.contactFormMessage} rows={4} required />
+                <label htmlFor="cf-subject">{t.contactFormSubject} <span className="required">*</span></label>
+                <input id="cf-subject" name="subject" type="text" value={form.subject} onChange={handleChange} placeholder={t.contactFormSubject} />
               </div>
-              <button className="contact-form-submit" type="submit">{t.contactFormSubmit}</button>
+              <div className="contact-form-field">
+                <label htmlFor="cf-message">{t.contactFormMessage} <span className="required">*</span></label>
+                <textarea id="cf-message" name="message" value={form.message} onChange={handleChange} placeholder={t.contactFormMessage} rows={4} />
+              </div>
+              <div style={{ position: "absolute", left: "-9999px" }} aria-hidden="true">
+                <label htmlFor="cf-hp">Website</label>
+                <input id="cf-hp" name="_honeypot" type="text" tabIndex={-1} autoComplete="off" />
+              </div>
+              <button className="contact-form-submit" type="submit" disabled={sending}>
+                {sending ? (
+                  <span className="btn-loading">
+                    <span className="spinner" />
+                    {t.contactFormSending}
+                  </span>
+                ) : (
+                  t.contactFormSubmit
+                )}
+              </button>
               {formStatus && (
                 <p className={`contact-form-status ${formError ? "status-error" : "status-ok"}`}>{formStatus}</p>
               )}

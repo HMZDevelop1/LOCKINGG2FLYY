@@ -1537,7 +1537,8 @@ a {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   box-shadow: 0 0 20px rgba(255, 79, 175, 0.1);
-  transition: transform 280ms ease, box-shadow 280ms ease, filter 280ms ease;
+  transition: transform 280ms ease, box-shadow 280ms ease, filter 280ms ease, opacity 280ms ease;
+  cursor: pointer;
 }
 
 .contact-form-submit:hover {
@@ -1548,6 +1549,40 @@ a {
 
 .contact-form-submit:active {
   transform: translateY(0) scale(0.97);
+}
+
+.contact-form-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.contact-form-submit:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(18, 5, 13, 0.25);
+  border-top-color: #12050d;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .contact-form-status {
