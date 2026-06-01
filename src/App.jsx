@@ -252,6 +252,38 @@ function TikTokIcon() {
   );
 }
 
+function StarIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function DiamondIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path d="M2 9l3-4h14l3 4-10 12L2 9z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M2 9h20" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+function ShieldIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path d="M12 2L3 7v5c0 6.06 3.94 11.56 9 13 5.06-1.44 9-6.94 9-13V7l-9-5z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function AwardIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function Logo({ className = "", animated = false }) {
   const [error, setError] = useState(false);
   return (
@@ -435,6 +467,14 @@ function Header() {
   );
 }
 
+const floatingIconVariant = (index) => ({
+  hidden: { opacity: 0, scale: 0, rotate: -20 },
+  visible: {
+    opacity: 1, scale: 1, rotate: 0,
+    transition: { delay: 0.5 + index * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+});
+
 function Hero() {
   const { t } = useLang();
   return (
@@ -464,6 +504,16 @@ function Hero() {
               <Scissors size={18} /> {t.seePrices}
             </button>
           </div>
+          <motion.div
+            className="hero-trust-row"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="trust-item"><StarIcon className="trust-icon" /><span>Premium</span></div>
+            <div className="trust-item"><ShieldIcon className="trust-icon" /><span>Professional</span></div>
+            <div className="trust-item"><DiamondIcon className="trust-icon" /><span>Luxury</span></div>
+          </motion.div>
         </motion.div>
 
         <motion.div
@@ -484,6 +534,19 @@ function Hero() {
             whileHover={{ scale: 1.05, rotateY: -16, transition: { duration: 0.4 } }}
           >
             <Logo animated />
+          </motion.div>
+          {/* Floating decorative icon bubbles */}
+          <motion.div className="hero-icon-bubble hero-icon-b1" variants={floatingIconVariant(0)}>
+            <StarIcon />
+          </motion.div>
+          <motion.div className="hero-icon-bubble hero-icon-b2" variants={floatingIconVariant(1)}>
+            <DiamondIcon />
+          </motion.div>
+          <motion.div className="hero-icon-bubble hero-icon-b3" variants={floatingIconVariant(2)}>
+            <ShieldIcon />
+          </motion.div>
+          <motion.div className="hero-icon-bubble hero-icon-b4" variants={floatingIconVariant(3)}>
+            <AwardIcon />
           </motion.div>
         </motion.div>
       </div>
