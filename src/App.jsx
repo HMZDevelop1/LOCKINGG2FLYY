@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Globe, Mail, MapPin, Menu, Phone, Scissors, Sparkles, X } from "lucide-react";
 import Lenis from "lenis";
@@ -273,10 +273,19 @@ function SocialLink({ href, label, children }) {
 function Header() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const [langOpen, setLangOpen] = useState(false);
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
+  const langRef = useRef(null);
   const { t, lang, setLang } = useLang();
-  const langs = ["en", "fr"];
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const go = useCallback((id) => {
     const el = document.getElementById(id);
@@ -312,7 +321,7 @@ function Header() {
     }
   }, [active]);
 
-  const toggleLang = () => setLang(lang === "en" ? "fr" : "en");
+  const toggleLang = () => setLang((prev) => (prev === "en" ? "fr" : "en"));
 
   return (
     <header className="site-header">
@@ -337,10 +346,32 @@ function Header() {
         </nav>
 
         <div className="header-actions">
-          <button className="lang-toggle" onClick={toggleLang} aria-label="Toggle language">
-            <Globe size={14} />
-            <span>{lang === "en" ? "FR" : "EN"}</span>
-          </button>
+          <div className="lang-switcher" ref={langRef}>
+            <button className="lang-toggle" onClick={() => setLangOpen((v) => !v)} aria-label="Toggle language">
+              <Globe size={14} />
+              <span>{lang.toUpperCase()}</span>
+              <svg className="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="10" height="10">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <motion.div
+              className="lang-dropdown"
+              initial={false}
+              animate={langOpen ? { opacity: 1, y: 0, pointerEvents: "auto" } : { opacity: 0, y: -4, pointerEvents: "none" }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <button className={`lang-option ${lang === "en" ? "lang-option-active" : ""}`} onClick={() => { setLang("en"); setLangOpen(false); }}>
+                <span className="lang-flag">EN</span>
+                <span className="lang-name">English</span>
+                {lang === "en" && <span className="lang-check">✓</span>}
+              </button>
+              <button className={`lang-option ${lang === "fr" ? "lang-option-active" : ""}`} onClick={() => { setLang("fr"); setLangOpen(false); }}>
+                <span className="lang-flag">FR</span>
+                <span className="lang-name">Francais</span>
+                {lang === "fr" && <span className="lang-check">✓</span>}
+              </button>
+            </motion.div>
+          </div>
           <SocialLink href={INSTAGRAM} label="Instagram"><InstagramIcon /></SocialLink>
           <SocialLink href={TIKTOK} label="TikTok"><TikTokIcon /></SocialLink>
           <a className="book-pill" href={GCAL} target="_blank" rel="noreferrer">
@@ -777,8 +808,12 @@ function Contact() {
 }
 
 export default function App() {
-  const [lang, setLang] = useState("fr");
+  const [lang, setLang] = useState(() => localStorage.getItem("lang") || "fr");
   const t = lang === "en" ? en : fr;
+
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
 
   const lenisRef = useRef(null);
 
