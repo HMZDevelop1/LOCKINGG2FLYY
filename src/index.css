@@ -263,6 +263,36 @@ a {
   flex-shrink: 0;
 }
 
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--pink-line);
+  border-radius: 999px;
+  background: rgba(255, 79, 175, 0.05);
+  color: var(--pink);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 240ms ease, background 240ms ease, color 240ms ease, border-color 240ms ease;
+}
+
+.lang-toggle:hover {
+  transform: translateY(-1px);
+  background: var(--pink);
+  color: #12050d;
+  border-color: var(--pink);
+  box-shadow: 0 0 20px var(--pink-glow);
+}
+
+.lang-toggle svg {
+  width: 12px;
+  height: 12px;
+}
+
 .menu-button {
   display: none;
 }
@@ -309,6 +339,13 @@ a {
   background: rgba(255, 79, 175, 0.1);
   color: var(--rose);
   border-color: rgba(255, 79, 175, 0.25);
+}
+
+.mobile-nav-lang {
+  background: rgba(255, 79, 175, 0.06);
+  border-color: rgba(255, 79, 175, 0.18);
+  color: var(--pink);
+  font-size: 0.62rem;
 }
 
 .mobile-active-dot {
