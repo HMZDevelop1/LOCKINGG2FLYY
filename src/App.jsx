@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Mail, MapPin, Menu, Phone, Scissors, Sparkles, X } from "lucide-react";
 
@@ -7,6 +7,7 @@ const LOGO = "/images/logo.png";
 const INSTAGRAM = "https://www.instagram.com/looking2flyy._.bymkash/";
 const TIKTOK = "https://www.tiktok.com/@looking2flyybymkash";
 const MAPS = "https://maps.app.goo.gl/HkJgV5TAzphz6q1U8";
+const GCAL = "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2mAzhPwgft50vqrC8X3G5VjLDVZH95me0Qugu4nXKPKbnUVmGVqOivbraemYZxtPZBG7DqcTGW";
 const PHONE = "873-660-0144";
 const PHONE_LINK = "tel:+18736600144";
 const EMAIL = "Meaneatanganaowona@gmail.com";
@@ -19,7 +20,7 @@ const sections = [
   ["about", "Studio"],
   ["policies", "Règles"],
   ["gallery", "Galerie"],
-  ["book", "Google Book"],
+  ["book", "Book"],
   ["contact", "Contact"],
 ];
 
@@ -173,10 +174,47 @@ function SocialLink({ href, label, children }) {
 
 function Header() {
   const [open, setOpen] = useState(false);
-  const go = (id) => {
+  const [active, setActive] = useState("home");
+  const navRef = useRef(null);
+  const indicatorRef = useRef(null);
+
+  const go = useCallback((id) => {
     scrollTo(id);
     setOpen(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    const ids = sections.map(([id]) => id);
+    const observers = [];
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActive(id);
+        },
+        { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const indicator = indicatorRef.current;
+    if (!nav || !indicator) return;
+    const activeBtn = nav.querySelector(`[data-section="${active}"]`);
+    if (activeBtn) {
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      indicator.style.width = `${btnRect.width}px`;
+      indicator.style.transform = `translateX(${btnRect.left - navRect.left}px)`;
+    }
+  }, [active]);
 
   return (
     <header className="site-header">
@@ -186,29 +224,56 @@ function Header() {
           <span>{BRAND}</span>
         </button>
 
-        <nav className="desktop-nav" aria-label="Navigation principale">
+        <nav className="desktop-nav" ref={navRef} aria-label="Navigation principale">
+          <div className="nav-indicator" ref={indicatorRef} />
           {sections.map(([id, label]) => (
-            <button key={id} onClick={() => go(id)}>{label}</button>
+            <button
+              key={id}
+              data-section={id}
+              className={`nav-link ${active === id ? "nav-link-active" : ""}`}
+              onClick={() => go(id)}
+            >
+              {label}
+            </button>
           ))}
         </nav>
 
         <div className="header-actions">
           <SocialLink href={INSTAGRAM} label="Instagram"><InstagramIcon /></SocialLink>
           <SocialLink href={TIKTOK} label="TikTok"><TikTokIcon /></SocialLink>
-          <button className="book-pill" onClick={() => go("book")}>Google Book</button>
-          <button className="menu-button" onClick={() => setOpen((value) => !value)} aria-label="Menu">
+          <a className="book-pill" href={GCAL} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            Book a Call
+          </a>
+          <button className="menu-button" onClick={() => setOpen((v) => !v)} aria-label="Menu">
             {open ? <X size={21} /> : <Menu size={21} />}
           </button>
         </div>
       </div>
 
-      {open && (
-        <nav className="mobile-nav" aria-label="Navigation mobile">
+      <motion.nav
+        className="mobile-nav"
+        aria-label="Navigation mobile"
+        initial={false}
+        animate={open ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="mobile-nav-inner">
           {sections.map(([id, label]) => (
-            <button key={id} onClick={() => go(id)}>{label}</button>
+            <button
+              key={id}
+              className={`mobile-nav-link ${active === id ? "mobile-nav-link-active" : ""}`}
+              onClick={() => go(id)}
+            >
+              {active === id && <span className="mobile-active-dot" />}
+              {label}
+            </button>
           ))}
-        </nav>
-      )}
+        </div>
+      </motion.nav>
     </header>
   );
 }
@@ -223,7 +288,14 @@ function Hero() {
           <h1>Clean Locs, Braids<br /><span>Made To Last</span></h1>
           <p className="hero-text">Private appointments in Gatineau for locs, natural hair and extension styles with a polished finish.</p>
           <div className="hero-buttons">
-            <button className="primary-button" onClick={() => scrollTo("book")}><CalendarDays size={19} /> Google Book</button>
+            <a className="primary-button gcal-button" href={GCAL} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="19" height="19">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
+              </svg>
+              Book a Call
+            </a>
             <button className="secondary-button" onClick={() => scrollTo("prices")}><Scissors size={19} /> Voir les prix</button>
           </div>
         </motion.div>
@@ -378,7 +450,7 @@ function Gallery() {
 
 function Booking() {
   return (
-    <Section id="book" title="Google Book" kicker="Reserve en un clic via Google.">
+    <Section id="book" title="Book" kicker="Reserve en un clic via Google Calendar.">
       <motion.div
         className="booking-scene"
         variants={formReveal}
@@ -403,23 +475,23 @@ function Booking() {
             <div className="google-book-hero">
               <div className="google-book-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v5l3 3" />
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                  <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
                 </svg>
               </div>
-              <h3>Reservez sur Google</h3>
-              <p>Cliquez ci-dessous pour reserver directement via votre compte Google. Simple, rapide et securise.</p>
+              <h3>Reservez votre rendez-vous</h3>
+              <p>Choisissez le creneau qui vous arrange via Google Calendar. Simple, rapide et securise.</p>
             </div>
-            <a className="primary-button google-book-btn" href={MAPS} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            <a className="gcal-book-btn" href={GCAL} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
               </svg>
-              Book with Google
+              Schedule Appointment
             </a>
-            <p className="google-book-note">Vous serez redirige vers Google Maps pour completer votre reservation.</p>
+            <p className="google-book-note">Vous serez redirige vers Google Calendar pour completer votre reservation.</p>
           </div>
         </div>
       </motion.div>
@@ -445,6 +517,16 @@ function Contact() {
 
   return (
     <Section id="contact" title="Contact" kicker="Reservation et informations.">
+      <div className="contact-actions">
+        <a className="gcal-contact-btn" href={GCAL} target="_blank" rel="noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
+          </svg>
+          Schedule Appointment
+        </a>
+      </div>
       <div className="contact-socials">
         <button type="button" onClick={() => openExternal(INSTAGRAM)}><InstagramIcon /> Instagram</button>
         <button type="button" onClick={() => openExternal(TIKTOK)}><TikTokIcon /> TikTok</button>
